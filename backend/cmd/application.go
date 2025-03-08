@@ -2,6 +2,8 @@ package main
 
 import (
 	"todo-planner/infrastructure"
+	"todo-planner/internal/developer"
+	"todo-planner/internal/schedular"
 	"todo-planner/internal/task"
 
 	"go.uber.org/zap"
@@ -12,6 +14,8 @@ type Application struct {
     Logger      infrastructure.ILogger
     Database    infrastructure.IDatabase
     TaskService task.IService
+    DeveloperService developer.IService
+    SchedularService schedular.IService
 }
 
 func (a *Application) Run() error {

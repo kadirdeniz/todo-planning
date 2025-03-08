@@ -7,6 +7,7 @@ import (
 
 type IRepository interface {
 	SaveTasks(tasks []model.Task) error
+	GetAllTasks() ([]model.Task, error)
 }
 
 type Repository struct {
@@ -23,4 +24,10 @@ func NewRepository(db infrastructure.IDatabase, logger infrastructure.ILogger) I
 
 func (r *Repository) SaveTasks(tasks []model.Task) error {
 	return r.db.GetDB().Create(tasks).Error
+}
+
+func (r *Repository) GetAllTasks() ([]model.Task, error) {
+	var tasks []model.Task
+	err := r.db.GetDB().Find(&tasks).Error
+	return tasks, err
 }

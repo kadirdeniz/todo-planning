@@ -6,6 +6,8 @@ package main
 
 import (
 	"todo-planner/infrastructure"
+	"todo-planner/internal/developer"
+	"todo-planner/internal/schedular"
 	"todo-planner/internal/task"
 
 	"github.com/google/wire"
@@ -20,6 +22,9 @@ func InitializeApplication() (*Application, error) {
 		task.NewRepository,
 		task.NewService,
 		task.NewServiceCaller,
+		developer.NewRepository,
+		developer.NewService,
+		schedular.NewService,
 		wire.Struct(new(Application), "*"),
 	)
 	return nil, nil
