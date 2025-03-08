@@ -1,9 +1,13 @@
 package task
 
-import "todo-planner/infrastructure"
+import (
+	"todo-planner/infrastructure"
+	"todo-planner/internal/model"
+)
 
 type IService interface {
-	GetTasks() ([]Model, error)
+	GetTasksFromProviders() ([]model.Task, error)
+	SaveTasks(tasks []model.Task) error
 }
 
 type Service struct {
@@ -22,6 +26,11 @@ func NewService(repository IRepository, serviceCaller IServiceCaller, config inf
 	}
 }
 
-func (s *Service) GetTasks() ([]Model, error) {
+
+func (s *Service) GetTasksFromProviders() ([]model.Task, error) {
 	return s.serviceCaller.GetTasks()
+}
+
+func (s *Service) SaveTasks(tasks []model.Task) error {
+	return s.repository.SaveTasks(tasks)
 }

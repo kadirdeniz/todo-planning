@@ -9,7 +9,6 @@ package main
 import (
 	"todo-planner/infrastructure"
 	"todo-planner/internal/task"
-	"todo-planner/internal/task/service-caller"
 )
 
 // Injectors from wire.go:
@@ -25,8 +24,7 @@ func InitializeApplication() (*Application, error) {
 	}
 	iDatabase := infrastructure.NewDatabase(config)
 	iRepository := task.NewRepository(iDatabase, iLogger)
-	v := provideTaskProviders(config, iLogger)
-	iServiceCaller := task.NewServiceCaller(config, v, iLogger)
+	iServiceCaller := task.NewServiceCaller(config, iLogger)
 	iService := task.NewService(iRepository, iServiceCaller, iDatabase, iLogger)
 	application := &Application{
 		Config:      config,
@@ -35,10 +33,4 @@ func InitializeApplication() (*Application, error) {
 		TaskService: iService,
 	}
 	return application, nil
-}
-
-// wire.go:
-
-func provideTaskProviders(config infrastructure.Config, logger infrastructure.ILogger) []task.IServiceCaller {
-	return []task.IServiceCaller{servicecaller.NewProvider1(config.Provider1.URL, logger), servicecaller.NewProvider2(config.Provider2.URL, logger)}
 }

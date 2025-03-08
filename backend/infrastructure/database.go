@@ -8,6 +8,7 @@ import (
 type IDatabase interface {
 	Connect() error
 	Migrate(models []interface{}) error
+	GetDB() *gorm.DB
 }
 
 type Database struct {
@@ -39,4 +40,8 @@ func (d *Database) Migrate(models []interface{}) error {
 	}
 
 	return nil
+}
+
+func (d *Database) GetDB() *gorm.DB {
+	return d.DB
 }

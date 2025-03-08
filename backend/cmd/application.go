@@ -20,6 +20,18 @@ func (a *Application) Run() error {
         return err
     }
 
+    tasks, err := a.TaskService.GetTasksFromProviders()
+    if err != nil {
+        a.Logger.Error("Failed to get tasks from providers", zap.Error(err))
+        return err
+    }
+
+    err = a.TaskService.SaveTasks(tasks)
+    if err != nil {
+        a.Logger.Error("Failed to save tasks", zap.Error(err))
+        return err
+    }
+
     a.Logger.Info("Application started")
     return nil
 } 

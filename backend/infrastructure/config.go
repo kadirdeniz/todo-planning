@@ -6,12 +6,13 @@ import (
 
 type Provider struct {
 	URL string
+	Name string
+	Type string
 }
 
 type Config struct {
 	Database Database
-	Provider1 Provider
-	Provider2 Provider
+	Providers []Provider
 }
 
 func NewConfig() (Config, error) {

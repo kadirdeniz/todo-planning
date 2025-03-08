@@ -1,8 +1,13 @@
 package task
 
-import "todo-planner/infrastructure"
+import (
+	"todo-planner/infrastructure"
+	"todo-planner/internal/model"
+)
 
-type IRepository interface {}
+type IRepository interface {
+	SaveTasks(tasks []model.Task) error
+}
 
 type Repository struct {
 	db infrastructure.IDatabase
@@ -14,4 +19,8 @@ func NewRepository(db infrastructure.IDatabase, logger infrastructure.ILogger) I
 		db: db,
 		logger: logger,
 	}
+}
+
+func (r *Repository) SaveTasks(tasks []model.Task) error {
+	return r.db.GetDB().Create(tasks).Error
 }
