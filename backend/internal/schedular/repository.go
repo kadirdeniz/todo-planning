@@ -7,6 +7,7 @@ import (
 
 type IRepository interface {
 	SaveSchedules(schedules []model.Schedule) error
+	GetAllSchedules() ([]model.Schedule, error)	
 }
 
 type Repository struct {
@@ -21,4 +22,13 @@ func NewRepository(db infrastructure.IDatabase) IRepository {
 
 func (r *Repository) SaveSchedules(schedules []model.Schedule) error {
 	return r.db.GetDB().Create(&schedules).Error
+}
+
+func (r *Repository) GetAllSchedules() ([]model.Schedule, error) {
+	var schedules []model.Schedule
+	err := r.db.GetDB().Preload("Tasks").Preload("Developers").Find(&schedules).Error
+	if err != nil {
+		return nil, err
+	}
+	return schedules, nil
 }

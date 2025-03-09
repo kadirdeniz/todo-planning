@@ -6,6 +6,7 @@ package main
 
 import (
 	"todo-planner/infrastructure"
+	"todo-planner/infrastructure/http"
 	"todo-planner/internal/developer"
 	"todo-planner/internal/schedular"
 	"todo-planner/internal/task"
@@ -13,7 +14,7 @@ import (
 	"github.com/google/wire"
 )
 
-
+//go:generate wire
 func InitializeApplication() (*Application, error) {
 	wire.Build(
 		infrastructure.NewConfig,
@@ -26,6 +27,8 @@ func InitializeApplication() (*Application, error) {
 		developer.NewService,
 		schedular.NewService,
 		schedular.NewRepository,
+		http.NewHandler,
+		http.NewRouter,
 		wire.Struct(new(Application), "*"),
 	)
 	return nil, nil

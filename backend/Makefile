@@ -1,3 +1,5 @@
+export PATH := $(PATH):$(shell go env GOPATH)/bin
+
 # Makefile
 .PHONY: run build wire clean
 
@@ -10,7 +12,7 @@ wire:
 build: wire
 	go build -o $(BINARY_NAME) cmd/main.go cmd/application.go cmd/wire_gen.go
 
-run: wire
+run: 
 	go run cmd/main.go cmd/application.go cmd/wire_gen.go
 
 clean:

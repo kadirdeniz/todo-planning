@@ -25,7 +25,7 @@ func InitializeApplication() (*Application, error) {
 		return nil, err
 	}
 	iDatabase := infrastructure.NewDatabase(config)
-	iRepository := task.NewRepository(iDatabase)
+	iRepository := task.NewRepository(iDatabase, iLogger)
 	iServiceCaller := task.NewServiceCaller(config, iLogger)
 	iService := task.NewService(iRepository, iServiceCaller, iDatabase, iLogger)
 	developerIRepository := developer.NewRepository(iDatabase)

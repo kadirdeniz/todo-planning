@@ -12,6 +12,7 @@ import (
 
 type IService interface {
 	ScheduleTasks(tasks []model.Task, developers []model.Developer) error
+	GetAllSchedules() ([]model.Schedule, error)
 }
 
 type Service struct {
@@ -45,16 +46,23 @@ func (s *Service) ScheduleTasks(tasks []model.Task, developers []model.Developer
 	// o(n^3) :(
 	for week := 1; week <= sprintWeeks; week++ {
 		for _, developer := range developers {
+			developerOverload := 0
 			for _, task := range tasks {
+				if developerOverload + int(task.EstimatedDuration.Hours()) > developer.WeeklyWorkHours {
+					continue
+				}
+				
 				schedules = append(schedules, model.Schedule{
 					Task: task,
 					Developer: developer,
 					SprintWeek: week,
-					StartTime: time.Now().AddDate(0, 0, week * 7),
+					StartTime: time.Now().AddDate(0, 0, week * 7),	
 					EndTime: time.Now().AddDate(0, 0, week * 7).Add(time.Duration(task.EstimatedDuration.Hours()) * time.Hour),
 					CreatedAt: time.Now(),
 					UpdatedAt: time.Now(),
 				})
+				developerOverload += int(task.EstimatedDuration.Hours())
+				tasks = tasks[1:]
 			}
 		}
 	}
@@ -80,4 +88,8 @@ func (s *Service) CalculateRequiredWeeks(tasks []model.Task, developers []model.
 
     requiredWeeks := math.Ceil(totalWorkload / weeklyTeamCapacity)
 	return int(requiredWeeks)
+}
+
+func (s *Service) GetAllSchedules() ([]model.Schedule, error) {
+	return s.Repository.GetAllSchedules()
 }

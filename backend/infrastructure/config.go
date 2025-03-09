@@ -10,9 +10,14 @@ type Provider struct {
 	Type string
 }
 
+type HTTP struct {
+	Port int
+}
+
 type Config struct {
 	Database Database
 	Providers []Provider
+	HTTP     HTTP
 }
 
 func NewConfig() (Config, error) {

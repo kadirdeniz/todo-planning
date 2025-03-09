@@ -2,6 +2,7 @@ package main
 
 import (
 	"todo-planner/infrastructure"
+	"todo-planner/infrastructure/http"
 	"todo-planner/internal/developer"
 	"todo-planner/internal/model"
 	"todo-planner/internal/schedular"
@@ -17,6 +18,8 @@ type Application struct {
     TaskService task.IService
     DeveloperService developer.IService
     SchedularService schedular.IService
+    Router http.IRouter
+    Handler http.IHandler
 }
 
 func (a *Application) Run() error {
@@ -73,7 +76,7 @@ func (a *Application) Run() error {
             WeeklyWorkHours: 40,
         },
     }
-    
+
     err = a.DeveloperService.SaveDevelopers(developers)
     if err != nil {
         a.Logger.Error("Failed to save developers", zap.Error(err))
@@ -83,6 +86,12 @@ func (a *Application) Run() error {
     err = a.SchedularService.ScheduleTasks(tasks, developers)
     if err != nil {
         a.Logger.Error("Failed to schedule tasks", zap.Error(err))
+        return err
+    }
+
+    a.Router.SetupRoutes()
+
+    if err = a.Router.Start(); err != nil {
         return err
     }
 
