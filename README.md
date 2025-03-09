@@ -65,5 +65,3 @@ make test
 # Veya docker ile tüm testleri çalıştır
 make test-composer-up
 ```
-
-### Proje Yapısı
