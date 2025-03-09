@@ -27,7 +27,6 @@ func (m *Provider1Mapper) Map(data []byte) ([]model.Task, error) {
 
 	for _, task := range response {
 		tasks = append(tasks, model.Task{
-			ID: task.ID,
 			Value: task.Value,
 			EstimatedDuration: task.EstimatedDuration,
 		})
@@ -54,7 +53,6 @@ func (m *Provider2Mapper) Map(data []byte) ([]model.Task, error) {
 
 	for _, task := range response {
 		tasks = append(tasks, model.Task{
-			ID: task.ID,
 			Value: task.Value,
 			EstimatedDuration: task.EstimatedDuration,
 		})

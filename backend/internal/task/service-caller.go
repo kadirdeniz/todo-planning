@@ -31,5 +31,15 @@ func NewServiceCaller(config infrastructure.Config, logger infrastructure.ILogge
 }
 
 func (s *serviceCaller) GetTasks() ([]model.Task, error) {
-    return nil, nil
+	// merge tasks from all providers
+	tasks := []model.Task{}
+	for _, provider := range s.providers {
+		providerTasks, err := provider.GetTasks()
+		if err != nil {
+			return nil, err
+		}
+		tasks = append(tasks, providerTasks...)
+	}
+
+	return tasks, nil
 }
