@@ -25,12 +25,13 @@ func InitializeApplication() (*Application, error) {
 		return nil, err
 	}
 	iDatabase := infrastructure.NewDatabase(config)
-	iRepository := task.NewRepository(iDatabase, iLogger)
+	iRepository := task.NewRepository(iDatabase)
 	iServiceCaller := task.NewServiceCaller(config, iLogger)
 	iService := task.NewService(iRepository, iServiceCaller, iDatabase, iLogger)
 	developerIRepository := developer.NewRepository(iDatabase)
 	developerIService := developer.NewService(developerIRepository)
-	schedularIService := schedular.NewService(developerIService, iService)
+	schedularIRepository := schedular.NewRepository(iDatabase)
+	schedularIService := schedular.NewService(schedularIRepository, iLogger, iService, developerIService)
 	application := &Application{
 		Config:           config,
 		Logger:           iLogger,

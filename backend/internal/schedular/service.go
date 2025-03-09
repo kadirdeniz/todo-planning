@@ -1,38 +1,83 @@
 package schedular
 
 import (
+	"math"
+	"sort"
+	"time"
+	"todo-planner/infrastructure"
 	"todo-planner/internal/developer"
+	"todo-planner/internal/model"
 	"todo-planner/internal/task"
 )
 
 type IService interface {
-	ScheduleTasks() error
+	ScheduleTasks(tasks []model.Task, developers []model.Developer) error
 }
 
 type Service struct {
-	DeveloperService developer.IService
+	Repository IRepository
+	Logger infrastructure.ILogger
 	TaskService task.IService
+	DeveloperService developer.IService
 }
 
-func NewService(developerService developer.IService, taskService task.IService) IService {
+func NewService(repository IRepository, logger infrastructure.ILogger, taskService task.IService, developerService developer.IService) IService {
 	return &Service{
-		DeveloperService: developerService,
+		Repository: repository,
+		Logger: logger,
 		TaskService: taskService,
+		DeveloperService: developerService,
 	}
 }
 
-func (s *Service) ScheduleTasks() error {
-	// developers, err := s.DeveloperService.GetAllDevelopers()
-	// if err != nil {
-	// 	return err
-	// }
+func (s *Service) ScheduleTasks(tasks []model.Task, developers []model.Developer) error {
+	sort.Slice(developers, func(i, j int) bool {
+		return developers[i].Seniority > developers[j].Seniority
+	})
 
-	// tasks, err := s.TaskService.GetAllTasks()
-	// if err != nil {
-	// 	return err
-	// }
+	sort.Slice(tasks, func(i, j int) bool {
+		return tasks[i].EstimatedDuration.Hours() > tasks[j].EstimatedDuration.Hours()
+	})
 
-	// TODO: Schedule tasks to developers
+	schedules := []model.Schedule{}
+	sprintWeeks := s.CalculateRequiredWeeks(tasks, developers)
+
+	// o(n^3) :(
+	for week := 1; week <= sprintWeeks; week++ {
+		for _, developer := range developers {
+			for _, task := range tasks {
+				schedules = append(schedules, model.Schedule{
+					Task: task,
+					Developer: developer,
+					SprintWeek: week,
+					StartTime: time.Now().AddDate(0, 0, week * 7),
+					EndTime: time.Now().AddDate(0, 0, week * 7).Add(time.Duration(task.EstimatedDuration.Hours()) * time.Hour),
+					CreatedAt: time.Now(),
+					UpdatedAt: time.Now(),
+				})
+			}
+		}
+	}
+
+	err := s.Repository.SaveSchedules(schedules)
+	if err != nil {
+		return err
+	}
 
 	return nil
+}
+
+func (s *Service) CalculateRequiredWeeks(tasks []model.Task, developers []model.Developer) int {
+	var totalWorkload float64
+    for _, task := range tasks {
+        totalWorkload += float64(task.EstimatedDuration.Hours())
+    }
+
+    var weeklyTeamCapacity float64
+    for _, dev := range developers {
+        weeklyTeamCapacity += float64(dev.WeeklyWorkHours)
+    }
+
+    requiredWeeks := math.Ceil(totalWorkload / weeklyTeamCapacity)
+	return int(requiredWeeks)
 }

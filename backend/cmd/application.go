@@ -28,6 +28,7 @@ func (a *Application) Run() error {
     if err := a.Database.Migrate([]interface{}{
         &model.Developer{},
         &model.Task{},
+        &model.Schedule{},
     }); err != nil {
         a.Logger.Error("Failed to migrate database", zap.Error(err))
         return err
@@ -45,30 +46,43 @@ func (a *Application) Run() error {
         return err
     }
 
-    err = a.DeveloperService.SaveDevelopers([]model.Developer{
+    developers := []model.Developer{
         {
-            Name: "John Doe",
-            Seniority: 1,
-        },
-        {
-            Name: "Jane Doe",
-            Seniority: 2,
-        },
-        {
-            Name: "Jim Doe",
-            Seniority: 3,
+            Name: "Jack Doe",
+            Seniority: 5,
+            WeeklyWorkHours: 40,
         },
         {
             Name: "Jill Doe",
             Seniority: 4,
+            WeeklyWorkHours: 40,
+        },
+                {
+            Name: "Jim Doe",
+            Seniority: 3,
+            WeeklyWorkHours: 40,
+        },
+                {
+            Name: "Jane Doe",
+            Seniority: 2,
+            WeeklyWorkHours: 40,
         },
         {
-            Name: "Jack Doe",
-            Seniority: 5,
+            Name: "John Doe",
+            Seniority: 1,
+            WeeklyWorkHours: 40,
         },
-    })
+    }
+    
+    err = a.DeveloperService.SaveDevelopers(developers)
     if err != nil {
         a.Logger.Error("Failed to save developers", zap.Error(err))
+        return err
+    }
+
+    err = a.SchedularService.ScheduleTasks(tasks, developers)
+    if err != nil {
+        a.Logger.Error("Failed to schedule tasks", zap.Error(err))
         return err
     }
 

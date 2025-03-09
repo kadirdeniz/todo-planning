@@ -25,6 +25,7 @@ func InitializeApplication() (*Application, error) {
 		developer.NewRepository,
 		developer.NewService,
 		schedular.NewService,
+		schedular.NewRepository,
 		wire.Struct(new(Application), "*"),
 	)
 	return nil, nil
