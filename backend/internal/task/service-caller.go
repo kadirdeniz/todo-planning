@@ -4,6 +4,8 @@ import (
 	"todo-planner/infrastructure"
 	"todo-planner/internal/model"
 	"todo-planner/internal/task/provider"
+
+	"go.uber.org/zap"
 )
 
 type IServiceCaller interface {
@@ -12,6 +14,12 @@ type IServiceCaller interface {
 
 type serviceCaller struct {
 	providers []IServiceCaller
+	logger    infrastructure.ILogger
+}
+
+type result struct {
+	tasks []model.Task
+	err   error
 }
 
 func NewServiceCaller(config infrastructure.Config, logger infrastructure.ILogger) IServiceCaller {
@@ -27,19 +35,28 @@ func NewServiceCaller(config infrastructure.Config, logger infrastructure.ILogge
 
 	return &serviceCaller{
 		providers: providers,
+		logger:    logger,
 	}
 }
 
 func (s *serviceCaller) GetTasks() ([]model.Task, error) {
-	// merge tasks from all providers
-	tasks := []model.Task{}
+	resultChan := make(chan result, len(s.providers))
+
 	for _, provider := range s.providers {
-		providerTasks, err := provider.GetTasks()
-		if err != nil {
-			return nil, err
-		}
-		tasks = append(tasks, providerTasks...)
+		go func(p IServiceCaller) {
+			tasks, err := p.GetTasks()
+			resultChan <- result{tasks: tasks, err: err}
+		}(provider)
 	}
 
-	return tasks, nil
+	var allTasks []model.Task
+	for i := 0; i < len(s.providers); i++ {
+		r := <-resultChan
+		if r.err != nil {
+			s.logger.Error("Failed to get tasks from provider", zap.Error(r.err))
+		}
+		allTasks = append(allTasks, r.tasks...)
+	}
+
+	return allTasks, nil
 }
