@@ -8,6 +8,7 @@ package main
 
 import (
 	"todo-planner/infrastructure"
+	"todo-planner/infrastructure/http"
 	"todo-planner/internal/developer"
 	"todo-planner/internal/schedular"
 	"todo-planner/internal/task"
@@ -15,6 +16,7 @@ import (
 
 // Injectors from wire.go:
 
+//go:generate wire
 func InitializeApplication() (*Application, error) {
 	config, err := infrastructure.NewConfig()
 	if err != nil {
@@ -32,6 +34,8 @@ func InitializeApplication() (*Application, error) {
 	developerIService := developer.NewService(developerIRepository)
 	schedularIRepository := schedular.NewRepository(iDatabase)
 	schedularIService := schedular.NewService(schedularIRepository, iLogger, iService, developerIService)
+	iHandler := http.NewHandler(schedularIService)
+	iRouter := http.NewRouter(config, iHandler)
 	application := &Application{
 		Config:           config,
 		Logger:           iLogger,
@@ -39,6 +43,8 @@ func InitializeApplication() (*Application, error) {
 		TaskService:      iService,
 		DeveloperService: developerIService,
 		SchedularService: schedularIService,
+		Router:           iRouter,
+		Handler:          iHandler,
 	}
 	return application, nil
 }

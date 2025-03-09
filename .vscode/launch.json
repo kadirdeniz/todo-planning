@@ -16,7 +16,8 @@
       },
       "args": [],
       "showLog": true,
-      "buildFlags": "-v"
+      "buildFlags": "-v",
+      "dlvFlags": ["--check-go-version=false"]
     }
   ]
 }
