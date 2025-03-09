@@ -26,7 +26,7 @@ func (r *Repository) SaveSchedules(schedules []model.Schedule) error {
 
 func (r *Repository) GetAllSchedules() ([]model.Schedule, error) {
 	var schedules []model.Schedule
-	err := r.db.GetDB().Preload("Tasks").Preload("Developers").Find(&schedules).Error
+	err := r.db.GetDB().Preload("Task").Preload("Developer").Find(&schedules).Error
 	if err != nil {
 		return nil, err
 	}

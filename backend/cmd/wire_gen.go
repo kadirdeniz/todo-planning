@@ -33,7 +33,7 @@ func InitializeApplication() (*Application, error) {
 	developerIRepository := developer.NewRepository(iDatabase)
 	developerIService := developer.NewService(developerIRepository)
 	schedularIRepository := schedular.NewRepository(iDatabase)
-	schedularIService := schedular.NewService(schedularIRepository, iLogger, iService, developerIService)
+	schedularIService := schedular.NewService(schedularIRepository, iLogger)
 	iHandler := http.NewHandler(schedularIService)
 	iRouter := http.NewRouter(config, iHandler)
 	application := &Application{

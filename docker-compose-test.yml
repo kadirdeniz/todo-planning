@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  test-db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=test
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_DB=todo_planning_test
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d todo_planning_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  test-runner:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    environment:
+      - CONFIG_PATH=/app/env-test.yaml
+      - DATABASE_URL=postgres://test:test@test-db:5432/todo_planning_test?sslmode=disable
+    volumes:
+      - ./backend:/app
+      - go-modules:/go/pkg/mod
+    depends_on:
+      test-db:
+        condition: service_healthy
+    command: make test
+
+volumes:
+  go-modules:

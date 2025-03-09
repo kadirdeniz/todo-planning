@@ -1,0 +1,8 @@
+database:
+  url: "postgres://test:test@test-db:5432/todo_planning_test?sslmode=disable"
+
+providers:
+  - type: "1"
+    url: "http://mock-provider-1"
+  - type: "2"
+    url: "http://mock-provider-2"

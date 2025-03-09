@@ -12,7 +12,7 @@ type IServiceCaller interface {
 	GetTasks() ([]model.Task, error)
 }
 
-type serviceCaller struct {
+type ServiceCaller struct {
 	providers []IServiceCaller
 	logger    infrastructure.ILogger
 }
@@ -33,13 +33,13 @@ func NewServiceCaller(config infrastructure.Config, logger infrastructure.ILogge
 		}
 	}
 
-	return &serviceCaller{
+	return &ServiceCaller{
 		providers: providers,
 		logger:    logger,
 	}
 }
 
-func (s *serviceCaller) GetTasks() ([]model.Task, error) {
+func (s *ServiceCaller) GetTasks() ([]model.Task, error) {
 	resultChan := make(chan result, len(s.providers))
 
 	for _, provider := range s.providers {

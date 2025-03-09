@@ -5,9 +5,7 @@ import (
 	"sort"
 	"time"
 	"todo-planner/infrastructure"
-	"todo-planner/internal/developer"
 	"todo-planner/internal/model"
-	"todo-planner/internal/task"
 )
 
 type IService interface {
@@ -18,16 +16,12 @@ type IService interface {
 type Service struct {
 	Repository IRepository
 	Logger infrastructure.ILogger
-	TaskService task.IService
-	DeveloperService developer.IService
 }
 
-func NewService(repository IRepository, logger infrastructure.ILogger, taskService task.IService, developerService developer.IService) IService {
+func NewService(repository IRepository, logger infrastructure.ILogger) IService {
 	return &Service{
 		Repository: repository,
 		Logger: logger,
-		TaskService: taskService,
-		DeveloperService: developerService,
 	}
 }
 

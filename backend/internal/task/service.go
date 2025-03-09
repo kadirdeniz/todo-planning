@@ -38,4 +38,3 @@ func (s *Service) SaveTasks(tasks []model.Task) error {
 func (s *Service) GetAllTasks() ([]model.Task, error) {
 	return s.repository.GetAllTasks()
 }
-
